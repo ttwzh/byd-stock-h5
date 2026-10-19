@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>比亚迪 2023 行情复盘</title>
+<style>
+  :root{
+    --td-brand:#0052D9; --td-brand-light:#E8F1FF;
+    --td-success:#2BA471; --td-danger:#E34D59; --td-warning:#ED7B2F;
+    --td-gray-1:#F3F3F3; --td-gray-2:#E7E7E7; --td-gray-5:#888888;
+    --td-gray-9:#181818; --td-bg:#F5F6F8; --td-card:#FFFFFF;
+    --td-radius:8px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:#e9ebef;color:var(--td-gray-9);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+    font-size:14px;line-height:1.6;}
+  .phone{max-width:480px;margin:0 auto;background:var(--td-bg);min-height:100vh;
+    box-shadow:0 0 24px rgba(0,0,0,.08);}
+  /* NavBar */
+  .navbar{background:var(--td-brand);color:#fff;padding:env(safe-area-inset-top) 0 0;
+    position:sticky;top:0;z-index:10;}
+  .navbar .bar{height:44px;display:flex;align-items:center;justify-content:center;position:relative;}
+  .navbar .title{font-size:17px;font-weight:600;}
+  .navbar .sub{text-align:center;font-size:12px;opacity:.85;padding-bottom:10px;}
+  /* section spacing */
+  .block{margin:12px;background:var(--td-card);border-radius:var(--td-radius);
+    padding:14px;box-shadow:0 1px 2px rgba(0,0,0,.03);}
+  .block h2{font-size:15px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+  .block h2::before{content:"";width:3px;height:14px;background:var(--td-brand);border-radius:2px;}
+  /* stat grid */
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .stat{background:var(--td-card);border-radius:var(--td-radius);padding:12px;
+    box-shadow:0 1px 2px rgba(0,0,0,.03);}
+  .stat .label{font-size:12px;color:var(--td-gray-5);}
+  .stat .num{font-size:22px;font-weight:700;margin-top:2px;}
+  .stat .num.up{color:var(--td-danger);} .stat .num.down{color:var(--td-success);}
+  .stat .num.flat{color:var(--td-gray-9);}
+  .stat .extra{font-size:11px;color:var(--td-gray-5);margin-top:2px;}
+  /* tags */
+  .tag{display:inline-block;font-size:11px;padding:1px 8px;border-radius:4px;
+    background:var(--td-brand-light);color:var(--td-brand);margin-right:4px;}
+  .tag.up{background:#FDECEC;color:var(--td-danger);}
+  .tag.down{background:#E8F6F0;color:var(--td-success);}
+  .tag.warn{background:#FDF3E8;color:var(--td-warning);}
+  /* cell list */
+  .cell{display:flex;justify-content:space-between;align-items:center;
+    padding:11px 0;border-bottom:1px solid var(--td-gray-1);font-size:13px;}
+  .cell:last-child{border-bottom:none;}
+  .cell .k{color:var(--td-gray-5);flex-shrink:0;}
+  .cell .v{text-align:right;font-weight:500;}
+  /* chart */
+  .chart{width:100%;height:280px;}
+  .chart-sm{width:100%;height:220px;}
+  /* conclusion */
+  .concl{font-size:13px;color:#333;line-height:1.7;}
+  .concl b{color:var(--td-brand);}
+  .foot{text-align:center;color:var(--td-gray-5);font-size:11px;padding:18px 0 30px;}
+  .legend-row{display:flex;gap:12px;font-size:11px;color:var(--td-gray-5);margin-bottom:6px;}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:3px;vertical-align:middle;}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="navbar">
+    <div class="bar"><div class="title">比亚迪 2023 行情复盘</div></div>
+    <div class="sub">后复权价 · 2023-01-03 ~ 2023-12-29 · 242 个交易日</div>
+  </div>
+
+  <!-- 概览 -->
+  <div class="block">
+    <h2>全年概览</h2>
+    <div class="stats" id="stats">
+      <div class="stat"><div class="label">全年后复权收益</div><div class="num flat" id="s-ret">--</div><div class="extra" id="s-ret-d">--</div></div>
+      <div class="stat"><div class="label">区间最高 / 最低</div><div class="num flat" id="s-hl" style="font-size:16px;">--</div><div class="extra" id="s-hl-d">--</div></div>
+      <div class="stat"><div class="label">最强单日 / 最弱单日</div><div class="num flat" style="font-size:16px;" id="s-bw">--</div><div class="extra" id="s-bw-d">--</div></div>
+      <div class="stat"><div class="label">年化波动率 · 涨/跌天</div><div class="num flat" style="font-size:16px;" id="s-vol">--</div><div class="extra" id="s-ud">--</div></div>
+    </div>
+  </div>
+
+  <!-- 分析过程 -->
+  <div class="block">
+    <h2>分析过程（口径说明）</h2>
+    <div class="cell"><span class="k">数据来源</span><span class="v">用户提供 Excel · 后复权日线</span></div>
+    <div class="cell"><span class="k">复权口径</span><span class="v">后复权（剔除分红/拆股影响）</span></div>
+    <div class="cell"><span class="k">区间收益</span><span class="v">(末收盘 / 首收盘 − 1) × 100%</span></div>
+    <div class="cell"><span class="k">均线</span><span class="v">MA5 / MA20 / MA60 滚动均值</span></div>
+    <div class="cell"><span class="k">年化波动</span><span class="v">日涨跌幅标准差 × √242</span></div>
+    <div class="cell"><span class="k">月度收益</span><span class="v">(月末收盘 / 月初开盘 − 1)</span></div>
+  </div>
+
+  <!-- K线图 -->
+  <div class="block">
+    <h2>日 K 线 + 均线 + 成交量</h2>
+    <div class="legend-row">
+      <span><i class="dot" style="background:#0052D9"></i>MA5</span>
+      <span><i class="dot" style="background:#ED7B2F"></i>MA20</span>
+      <span><i class="dot" style="background:#888"></i>MA60</span>
+      <span style="margin-left:auto">红涨 / 绿跌</span>
+    </div>
+    <div id="chart-k" class="chart"></div>
+  </div>
+
+  <!-- 月度收益 -->
+  <div class="block">
+    <h2>月度收益（%）</h2>
+    <div id="chart-m" class="chart-sm"></div>
+  </div>
+
+  <!-- 关键节点 -->
+  <div class="block">
+    <h2>关键节点</h2>
+    <div class="cell"><span class="k">年内高点</span><span class="v"><span class="tag up">307.38</span>2023-02-02</span></div>
+    <div class="cell"><span class="k">最强单日</span><span class="v"><span class="tag up">+6.46%</span>2023-02-01</span></div>
+    <div class="cell"><span class="k">最弱单日</span><span class="v"><span class="tag down">−5.18%</span>2023-11-24</span></div>
+    <div class="cell"><span class="k">最深回撤月</span><span class="v"><span class="tag down">11 月 −16.16%</span></span></div>
+    <div class="cell"><span class="k">最佳月份</span><span class="v"><span class="tag up">1 月 +11.41%</span></span></div>
+  </div>
+
+  <!-- 结论 -->
+  <div class="block">
+    <h2>复盘结论</h2>
+    <p class="concl">
+      比亚迪 2023 年后复权全年下跌 <b>23.43%</b>：年初在 1 月冲高、2 月 2 日见顶
+      <b>307.38</b> 后转入中期震荡下行；三季度走弱，<b>11 月单月大跌 16.16%</b>，
+      年末收于 200.40，全年下跌天数（140）多于上涨天数（102），年化波动约 26.42%，
+      属于典型的「冲高见顶 → 逐级回撤」走势。
+      <span class="tag warn">仅为历史数据复盘，不构成投资建议</span>
+    </p>
+  </div>
+
+  <div class="foot">数据：比亚迪后复权日线 · 页面由 ECharts + TDesign 风格构建</div>
+</div>
+
+<script src="assets/echarts.min.js"></script>
+<script>
+fetch('data/byd_2023.json').then(r=>r.json()).then(data=>{
+  const s = data.summary;
+  document.getElementById('s-ret').textContent = (s.total_return_pct>0?'+':'') + s.total_return_pct + '%';
+  document.getElementById('s-ret').className = 'num ' + (s.total_return_pct>0?'up':'down');
+  document.getElementById('s-ret-d').textContent = s.first_close + ' → ' + s.last_close;
+  document.getElementById('s-hl').textContent = s.high + ' / ' + s.low;
+  document.getElementById('s-hl-d').textContent = '高点 ' + s.high_date + ' · 低点 ' + s.low_date;
+  document.getElementById('s-bw').textContent = '+' + s.best_day.pct + '% / ' + s.worst_day.pct + '%';
+  document.getElementById('s-bw-d').textContent = s.best_day.date + ' / ' + s.worst_day.date;
+  document.getElementById('s-vol').textContent = s.annual_vol_pct + '%';
+  document.getElementById('s-ud').textContent = '涨 ' + s.up_days + ' 天 · 跌 ' + s.down_days + ' 天';
+
+  // K-line chart
+  const dates = data.series.map(r=>r.d);
+  const ohlc2 = data.series.map(r=>[r.o,r.c,r.l,r.h]);
+  const vols = data.series.map((r,i)=>[i,r.v, r.c>=r.o?1:-1]);
+  const ma = k => data.series.map(r=>r['ma'+k]);
+
+  const kc = echarts.init(document.getElementById('chart-k'));
+  kc.setOption({
+    animation:false,
+    grid:[{left:6,right:6,top:10,height:'58%'},{left:6,right:6,top:'72%',height:'20%'}],
+    xAxis:[
+      {type:'category',data:dates,gridIndex:0,axisLine:{lineStyle:{color:'#ddd'}},axisLabel:{show:false}},
+      {type:'category',data:dates,gridIndex:1,axisLabel:{color:'#999',fontSize:9,interval:30},axisLine:{lineStyle:{color:'#ddd'}}}
+    ],
+    yAxis:[
+      {scale:true,gridIndex:0,splitLine:{lineStyle:{color:'#f0f0f0'}},axisLabel:{fontSize:9,color:'#999'}},
+      {scale:true,gridIndex:1,splitNumber:2,axisLabel:{fontSize:9,color:'#999'}}
+    ],
+    dataZoom:[{type:'inside',xAxisIndex:[0,1],start:0,end:100}],
+    tooltip:{trigger:'axis',axisPointer:{type:'cross'},fontSize:11},
+    series:[
+      {name:'K线',type:'candlestick',data:ohlc2,
+        itemStyle:{color:'#E34D59',color0:'#2BA471',borderColor:'#E34D59',borderColor0:'#2BA471'}},
+      {name:'MA5',type:'line',data:ma(5),smooth:true,showSymbol:false,lineStyle:{width:1,color:'#0052D9'}},
+      {name:'MA20',type:'line',data:ma(20),smooth:true,showSymbol:false,lineStyle:{width:1,color:'#ED7B2F'}},
+      {name:'MA60',type:'line',data:ma(60),smooth:true,showSymbol:false,lineStyle:{width:1,color:'#888'}},
+      {name:'成交量',type:'bar',data:vols,xAxisIndex:1,yAxisIndex:1,
+        itemStyle:{color:p=>p.data[2]>0?'#E34D59':'#2BA471'}}
+    ]
+  });
+
+  // Monthly chart
+  const mc = echarts.init(document.getElementById('chart-m'));
+  const m = data.monthly;
+  mc.setOption({
+    animation:false,
+    grid:{left:6,right:6,top:16,bottom:24},
+    xAxis:{type:'category',data:m.map(r=>r['月份'].slice(5)+'月'),axisLabel:{fontSize:10,color:'#666'}},
+    yAxis:{type:'value',axisLabel:{fontSize:9,color:'#999'},splitLine:{lineStyle:{color:'#f0f0f0'}}},
+    tooltip:{trigger:'axis',fontSize:11,formatter:p=>p[0].name+'：'+p[0].value+'%'},
+    series:[{type:'bar',data:m.map(r=>r['月涨跌幅%']),
+      itemStyle:{color:p=>p.value>=0?'#E34D59':'#2BA471',borderRadius:[3,3,0,0]},barWidth:'55%'}]
+  });
+  window.addEventListener('resize',()=>{kc.resize();mc.resize();});
+});
+</script>
+</body>
+</html>
